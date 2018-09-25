@@ -1,8 +1,7 @@
 import csv
 
-matrix = []
-
 def readGameState(path):
+    matrix = []
     with open(path) as gameStateCSV:
         readCSV = csv.reader(gameStateCSV, delimiter=',')
         
@@ -36,17 +35,3 @@ def inGoalCheck(state):
             if item == "-1":
                 return False
     return True
-
-state = readGameState('../state/SBP-bricks-level1.txt')
-stateAdd = "Original State Address" + hex(id(state))
-newState = cloneState(state)
-newStateAdd = "New State Address " + hex(id(newState))
-print("ORIGINAL")
-print(stateAdd)
-printState(state)
-print("NEW")
-print(newStateAdd)
-printState(newState)
-
-inGoal = "In Goal? " + str(inGoalCheck(state))
-print(inGoal)
