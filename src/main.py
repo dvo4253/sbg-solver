@@ -1,6 +1,9 @@
 import stateUtils
+import sys
 
-state = stateUtils.readGameState('../state/SBP-bricks-level2.txt')
+inputStateFile = sys.argv[1]
+# '../state/SBP-level1.txt'
+state = stateUtils.readGameState(inputStateFile)
 stateAdd = "Original State Address" + hex(id(state))
 newState = stateUtils.cloneState(state)
 newStateAdd = "New State Address " + hex(id(newState))
