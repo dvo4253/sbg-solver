@@ -1,4 +1,5 @@
 from Move import Move
+from Move import DIRECTION
 import csv
 
 
@@ -28,6 +29,19 @@ def printState(state):
             line = line  + str(item) + ', '
         print(line)
 
+# Gets string output of state
+def strState(state):
+    strResult = ""
+    for row in state:
+        line = ''
+        for item in row:
+            line = line  + str(item) + ', \n'
+        strResult += line
+
+    return strResult
+
+    
+
 def cloneState(state):
     newState = []
     for row in state:
@@ -43,27 +57,6 @@ def inGoalCheck(state):
             if item == -1:
                 return False
     return True
-
-# def getMoves(state, index):
-#     moveList = []
-#     i = 1
-#     rowMax = len(state)
-#     j = 0
-
-#     while i < rowMax:
-#         columnMax = state[i]
-#         while j < columnMax:
-#             if checkUpValid(state, state[i][j]):
-#                 moveList.append('u')
-#             if checkDownValid(state, state[i][j]):
-#                 moveList.append('d')
-#             if checkRightValid(state, state[i][j]):
-#                 moveList.append('r')
-#             if checkLeftValid(state, state[i][j]):
-#                 moveList.append('l')
-#         i += 1
-#         j = 0
-#     return moveList
 
 def normalizeState(state):
     nextIdx = 3
@@ -124,6 +117,12 @@ def swapIdx(idx1, idx2, state):
 # state must be normalized
 def getValidMoves(state):
     moves = []
+    # I started with this value at 3. We need to have a separate function that checks of the goal
+    # piece can move. Heuristically this is a special case that we want to track separately most likely.
+    # This is a separte call as well because we keep the rest of the pieces normalized. The goal piece
+    # always has an id of 2. Essentially we can have a separate function the gets goal moves and appends
+    # this on to the moves list at the end. Or we can have a separate list for goal moves and if that
+    # list is populated we choose one from that list first (hopefully towards to goal)
     nextIdx = 3
     w = state[0][0]
     h = state[0][1]
@@ -140,25 +139,25 @@ def getValidMoves(state):
                 # Check If Right Move Is Valid
                 rightValid = checkRightValid(i,j,state,nextIdx)
                 if (rightValid): 
-                    move = Move(nextIdx, 'r')
+                    move = Move(nextIdx, DIRECTION.RIGHT)
                     moves.append(move)
                 
                 # Check If Left Move Is Valid
                 leftValid = checkLeftValid(i,j,state,nextIdx)
                 if (leftValid): 
-                    move = Move(nextIdx, 'l')
+                    move = Move(nextIdx, DIRECTION.LEFT)
                     moves.append(move)
                 
                 # Check If Down Move Is Valid
                 downValid = checkDownValid(i,j,state,nextIdx)
                 if (downValid): 
-                    move = Move(nextIdx, 'd')
+                    move = Move(nextIdx, DIRECTION.DOWN)
                     moves.append(move)
                 
                 # Check If Up Move Is Valid
                 upValid = checkUpValid(i,j,state,nextIdx)
                 if (upValid): 
-                    move = Move(nextIdx, 'u')
+                    move = Move(nextIdx, DIRECTION.UP)
                     moves.append(move)
 
             nextIdx += 1
@@ -166,8 +165,52 @@ def getValidMoves(state):
                 j += 1
         i += 1
 
+    moves += getGoalMoves(state)
+
     return moves
 
+
+def getGoalMoves(state):
+    moves = []
+    goalIdx = 2
+    w = state[0][0]
+    h = state[0][1]
+    #print("h: " + str(h))
+    i = 2
+    j = 1
+
+    #goalFound = False
+    while i < h:
+        while j < w:
+            if state[i][j] == goalIdx:
+                # goalFound = True
+                # Check If Right Move Is Valid
+                rightValid = checkRightValid(i,j,state,goalIdx)
+                if (rightValid): 
+                    move = Move(goalIdx, DIRECTION.RIGHT)
+                    moves.append(move)
+                
+                # Check If Left Move Is Valid
+                leftValid = checkLeftValid(i,j,state,goalIdx)
+                if (leftValid): 
+                    move = Move(goalIdx, DIRECTION.LEFT)
+                    moves.append(move)
+                
+                # Check If Down Move Is Valid
+                downValid = checkDownValid(i,j,state,goalIdx)
+                if (downValid): 
+                    move = Move(goalIdx, DIRECTION.DOWN)
+                    moves.append(move)
+                
+                # Check If Up Move Is Valid
+                upValid = checkUpValid(i,j,state,goalIdx)
+                if (upValid): 
+                    move = Move(goalIdx, DIRECTION.UP)
+                    moves.append(move)
+            j +=1
+        i += 1
+
+    return moves
 
 # These calls should be consolidated to only one nested loop
 def checkUpValid(i,j, state, id):
@@ -243,3 +286,152 @@ def checkLeftValid(i,j, state, id):
         vertCursor += 1
 
     return valid
+
+def isStateEqual(state1, state2):
+    
+    w1 = state1[0][0]
+    h1 = state1[0][1]
+
+    w2 = state2[0][0]
+    h2 = state2[0][1]
+
+    i = 1
+    j = 0
+    equalFlag = True
+
+    # Verify the size is the same
+    if (w1 != w2 or h1 != h2):
+        return False
+
+    h = h1
+    w = w1
+
+    while (i < h and equalFlag):
+        while (j < w and equalFlag):
+            if (state1[i][j] != state2[i][j]):
+                equalFlag = False
+            j += 1
+        i += 1
+
+    return equalFlag
+
+
+def isInClosedSet(closedSet, state):
+
+    isClosed = False
+    for closedState in closedSet:
+        isClosed = isStateEqual(closedState, state)
+        if (isClosed):
+            break
+
+    return isClosed
+
+def makeMove(currentState, move):
+    nextState = []
+    if(move.dir == DIRECTION.LEFT):
+        nextState = moveLeft(currentState, move)
+    elif(move.dir == DIRECTION.RIGHT):
+        nextState = moveRight(currentState, move)
+    elif(move.dir == DIRECTION.DOWN):
+        nextState = moveDown(currentState, move)
+    elif(move.dir == DIRECTION.UP):
+        nextState = moveUp(currentState, move)
+    else:
+        nextState = cloneState(currentState)
+
+    return nextState
+
+
+
+def moveLeft(state, move):
+    w = state[0][0]
+    h = state[0][1]
+    i = 1
+    j = 0
+    leftMost = True
+    
+    nextState = cloneState(state)
+    
+    while i < h:
+        while j < w:
+            if (state[i][j] == move.id):
+                nextState[i][j-1] = state[i][j]
+                if (leftMost):
+                    nextState[i][j] = 0
+                    leftMost = False
+            j += 1
+        i += 1
+        j = 0
+        leftMost = True
+    
+    return nextState
+
+
+def moveRight(state, move):
+    w = state[0][0]
+    h = state[0][1]
+    i = 1
+    j = w-1
+    rightMost = True
+    
+    nextState = cloneState(state)
+    
+    while i < h:
+        while j > 0:
+            if (state[i][j] == move.id):
+                nextState[i][j+1] = state[i][j]
+                if (rightMost):
+                    nextState[i][j] = 0
+                    rightMost = False
+            j -= 1
+        i += 1
+        j = w-1
+        rightMost = True
+    
+    return nextState
+
+def moveUp(state, move):
+    w = state[0][0]
+    h = state[0][1]
+    i = h-1
+    j = 0
+    bottomMost = True
+    
+    nextState = cloneState(state)
+    
+    while i > 0:
+        while j < w:
+            if (state[i][j] == move.id):
+                nextState[i-1][j] = state[i][j]
+                if (bottomMost):
+                    nextState[i][j] = 0
+                    bottomMost = False
+            j += 1
+        i -= 1
+        j = 0
+        bottomMost = True
+    
+    return nextState
+
+def moveDown(state, move):
+    w = state[0][0]
+    h = state[0][1]
+    i = 1
+    j = 0
+    topMost = True
+    
+    nextState = cloneState(state)
+    
+    while i < h:
+        while j < w:
+            if (state[i][j] == move.id):
+                nextState[i+1][j] = state[i][j]
+                if (topMost):
+                    nextState[i][j] = 0
+                    topMost = False
+            j += 1
+        i += 1
+        j = 0
+        topMost = True
+    
+    return nextState
