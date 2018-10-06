@@ -227,7 +227,7 @@ def checkUpValid(i,j, state, id):
         while (state[i+ vertCursor][j] == id) and (i + vertCursor > 1):
             vertCursor -= 1
         
-        if state[i+ vertCursor][j + horzCursor] != 0:
+        if state[i+ vertCursor][j + horzCursor] <= 0:
             valid = False
             vertCursor = 0
         horzCursor += 1
@@ -245,7 +245,7 @@ def checkDownValid(i,j, state, id):
         while (state[i+ vertCursor][j] == id) and (i + vertCursor < h):
             vertCursor += 1
         
-        if state[i+ vertCursor][j + horzCursor] != 0:
+        if state[i+ vertCursor][j + horzCursor] <= 0:
             valid = False
             vertCursor = 0
         horzCursor += 1
@@ -263,7 +263,7 @@ def checkRightValid(i,j, state, id):
         while state[i+ vertCursor][j + horzCursor] == id and j < w and i < h:
             horzCursor += 1
         
-        if state[i+ vertCursor][j + horzCursor] != 0:
+        if state[i+ vertCursor][j + horzCursor] <= 0:
             valid = False
             horzCursor = 0
         vertCursor += 1
@@ -283,7 +283,7 @@ def checkLeftValid(i,j, state, id):
         while state[i+ vertCursor][j + horzCursor] == id and j > 1 and i > 1:
             horzCursor -= 1
         
-        if state[i+ vertCursor][j + horzCursor] != 0:
+        if state[i+ vertCursor][j + horzCursor] <= 0:
             valid = False
             horzCursor = 0
         vertCursor += 1

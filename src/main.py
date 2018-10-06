@@ -28,10 +28,10 @@ def execute(fileName):
 
     currentState = state
     # while(not stateUtils.inGoalCheck(currentState)):
-    MAX_MOVES = 500
+    MAX_MOVES = 100000
     move_count = 0
     while(not stateUtils.inGoalCheck(currentState) and move_count < MAX_MOVES):
-        input("Press Enter to continue...")
+        # input("Press Enter to continue...")
         closed.append(currentState)
         moves = stateUtils.getValidMoves(currentState)
         selectedMove = random.randint(0,len(moves) - 1)
