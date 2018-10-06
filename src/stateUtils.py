@@ -1,7 +1,6 @@
-from Move import Move
-from Move import DIRECTION
+from src.Move import Move, DIRECTION
 import csv
-
+__all__ = ["readGameState"]
 
 def readGameState(path):
     matrix = []
@@ -179,11 +178,11 @@ def getGoalMoves(state):
     i = 2
     j = 1
 
-    #goalFound = False
+    goalFound = False
     while i < h:
         while j < w:
             if state[i][j] == goalIdx:
-                # goalFound = True
+                goalFound = True
                 # Check If Right Move Is Valid
                 rightValid = checkRightValid(i,j,state,goalIdx)
                 if (rightValid): 
@@ -208,6 +207,10 @@ def getGoalMoves(state):
                     move = Move(goalIdx, DIRECTION.UP)
                     moves.append(move)
             j +=1
+            if (goalFound):
+                break
+        if (goalFound):
+            break
         i += 1
 
     return moves
@@ -306,12 +309,18 @@ def isStateEqual(state1, state2):
     h = h1
     w = w1
 
+    #print("h: " + str(h))
+    #print("w: " + str(w))
     while (i < h and equalFlag):
+
         while (j < w and equalFlag):
+            #print("i: " + str(i))
+            #print("j: " + str(j))
             if (state1[i][j] != state2[i][j]):
                 equalFlag = False
             j += 1
         i += 1
+        j = 0
 
     return equalFlag
 
@@ -347,6 +356,30 @@ def moveLeft(state, move):
     w = state[0][0]
     h = state[0][1]
     i = 1
+    j = w - 1
+    rightMost = True
+    
+    nextState = cloneState(state)
+    
+    while i < h:
+        while j > 0:
+            if (state[i][j] == move.id):
+                nextState[i][j-1] = state[i][j]
+                if (rightMost):
+                    nextState[i][j] = 0
+                    rightMost = False
+            j -= 1
+        i += 1
+        j = w - 1
+        rightMost = True
+    
+    return nextState
+
+
+def moveRight(state, move):
+    w = state[0][0]
+    h = state[0][1]
+    i = 1
     j = 0
     leftMost = True
     
@@ -355,7 +388,7 @@ def moveLeft(state, move):
     while i < h:
         while j < w:
             if (state[i][j] == move.id):
-                nextState[i][j-1] = state[i][j]
+                nextState[i][j+1] = state[i][j]
                 if (leftMost):
                     nextState[i][j] = 0
                     leftMost = False
@@ -366,50 +399,28 @@ def moveLeft(state, move):
     
     return nextState
 
-
-def moveRight(state, move):
-    w = state[0][0]
-    h = state[0][1]
-    i = 1
-    j = w-1
-    rightMost = True
-    
-    nextState = cloneState(state)
-    
-    while i < h:
-        while j > 0:
-            if (state[i][j] == move.id):
-                nextState[i][j+1] = state[i][j]
-                if (rightMost):
-                    nextState[i][j] = 0
-                    rightMost = False
-            j -= 1
-        i += 1
-        j = w-1
-        rightMost = True
-    
-    return nextState
-
 def moveUp(state, move):
     w = state[0][0]
     h = state[0][1]
     i = h-1
     j = 0
     bottomMost = True
-    
+    found = False
     nextState = cloneState(state)
     
     while i > 0:
         while j < w:
             if (state[i][j] == move.id):
+                found = True
                 nextState[i-1][j] = state[i][j]
                 if (bottomMost):
                     nextState[i][j] = 0
-                    bottomMost = False
             j += 1
+        if (found):
+            bottomMost = False
         i -= 1
         j = 0
-        bottomMost = True
+        # bottomMost = True
     
     return nextState
 
@@ -419,19 +430,22 @@ def moveDown(state, move):
     i = 1
     j = 0
     topMost = True
-    
+    found = False
     nextState = cloneState(state)
     
     while i < h:
         while j < w:
             if (state[i][j] == move.id):
+                found = True
                 nextState[i+1][j] = state[i][j]
                 if (topMost):
                     nextState[i][j] = 0
-                    topMost = False
+                    
             j += 1
+        if (found):
+            topMost = False
         i += 1
         j = 0
-        topMost = True
+        # topMost = True
     
     return nextState

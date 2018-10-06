@@ -1,5 +1,7 @@
 import stateUtils
 import sys
+from Move import Move
+from Move import DIRECTION
 
 # Get the initial state file from input
 inputStateFile = sys.argv[1]
@@ -21,9 +23,14 @@ moves = stateUtils.getValidMoves(state)
 closed = []
 closed.append(state)
 
+
 print("Moves")
-for move in moves:
-    print(move)
-    nextState = stateUtils.makeMove(state, move)
-    stateUtils.printState(nextState)
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~")
+move = Move(2, DIRECTION.DOWN)
+print(move)
+nextState = stateUtils.makeMove(state, move )
+stateUtils.printState(nextState)
+# for move in moves:
+#     print(move)
+#     nextState = stateUtils.makeMove(state, move)
+#     stateUtils.printState(nextState)
+#     print("~~~~~~~~~~~~~~~~~~~~~~~~~")

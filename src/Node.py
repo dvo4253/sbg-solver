@@ -1,4 +1,4 @@
-import stateUtils
+import src.stateUtils as stateUtils
 
 class Node:
     def __init__(self, state, moves):
