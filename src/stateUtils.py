@@ -181,6 +181,11 @@ def getGoalMoves(state):
     goalFound = False
     while i < h:
         while j < w:
+            # print("i: " + str(i))
+            # print("j: " + str(j))
+            
+            # print("goalIdx: " + str(goalIdx))
+            # print("state[i][j]: " + str(state[i][j]))
             if state[i][j] == goalIdx:
                 goalFound = True
                 # Check If Right Move Is Valid
@@ -190,6 +195,7 @@ def getGoalMoves(state):
                     moves.append(move)
                 
                 # Check If Left Move Is Valid
+                # print("Checking Goal Left")
                 leftValid = checkLeftValid(i,j,state,goalIdx)
                 if (leftValid): 
                     move = Move(goalIdx, DIRECTION.LEFT)
@@ -211,25 +217,26 @@ def getGoalMoves(state):
                 break
         if (goalFound):
             break
+        j = 1
         i += 1
+
+    #print("MOVES: ")
+    for move in moves:
+        print(move)
 
     return moves
 
 # These calls should be consolidated to only one nested loop
 def checkUpValid(i,j, state, id):
     w = state[0][0]
-    h = state[0][1]
+    # h = state[0][1]
     horzCursor = 0
-    vertCursor = 0
+    #vertCursor = 0
     valid = True
 
-    while state[i+ vertCursor][j + horzCursor] == id and j < w and i > 1:
-        while (state[i+ vertCursor][j] == id) and (i + vertCursor > 1):
-            vertCursor -= 1
-        
-        if state[i+ vertCursor][j + horzCursor] <= 0:
+    while state[i][j + horzCursor] == id and j + horzCursor < w:
+        if((state[i -1][j + horzCursor] > 0) or (id != 2 and state[i -1][j + horzCursor] == -1)):
             valid = False
-            vertCursor = 0
         horzCursor += 1
 
     return valid
@@ -245,9 +252,9 @@ def checkDownValid(i,j, state, id):
         while (state[i+ vertCursor][j] == id) and (i + vertCursor < h):
             vertCursor += 1
         
-        if state[i+ vertCursor][j + horzCursor] <= 0:
+        if((state[i+ vertCursor][j + horzCursor] > 0) or (id != 2 and state[i+ vertCursor][j + horzCursor] == -1)):
             valid = False
-            vertCursor = 0
+        vertCursor = 0
         horzCursor += 1
 
     return valid
@@ -259,15 +266,23 @@ def checkRightValid(i,j, state, id):
     vertCursor = 0
     valid = True
 
+    # print("i: " + str(i))
+    # print("j: " + str(j))
+    # print("id: " + str(id))
+
     while (state[i+ vertCursor][j] == id) and (i + vertCursor < h):
+        # print("state[i+ vertCursor][j]: " + str(state[i+ vertCursor][j]))
         while state[i+ vertCursor][j + horzCursor] == id and j < w and i < h:
             horzCursor += 1
-        
-        if state[i+ vertCursor][j + horzCursor] <= 0:
+        # print("state[i+ vertCursor][j + horzCursor]: " + str(state[i+ vertCursor][j + horzCursor]))
+        if((state[i+ vertCursor][j + horzCursor] > 0) or (id != 2 and state[i+ vertCursor][j + horzCursor] == -1)):
             valid = False
-            horzCursor = 0
+        
+        horzCursor = 0
         vertCursor += 1
-
+        # print("VALID: " + str(valid))
+        
+    # print("VALID2: " + str(valid))
     return valid
 
     
@@ -279,14 +294,25 @@ def checkLeftValid(i,j, state, id):
     vertCursor = 0
     valid = True
 
-    while (state[i+ vertCursor][j] == id) and (i + vertCursor > 1):
-        while state[i+ vertCursor][j + horzCursor] == id and j > 1 and i > 1:
-            horzCursor -= 1
-        
-        if state[i+ vertCursor][j + horzCursor] <= 0:
+    # print("i: " + str(i))
+    # print("j: " + str(j))
+    # print("id: " + str(id))
+
+    while (state[i+ vertCursor][j] == id) and (i + vertCursor < h):
+        # print("vertCursor: " + str(vertCursor))
+        # print("state[i+ vertCursor][j - 1]: " + str(state[i+ vertCursor][j - 1]))
+        if((state[i+ vertCursor][j - 1] > 0) or (id != 2 and state[i+ vertCursor][j - 1] == -1)):
             valid = False
-            horzCursor = 0
         vertCursor += 1
+
+
+        # while state[i+ vertCursor][j + horzCursor] == id and j > 1 and i > 1:
+        #     horzCursor -= 1
+        
+        # if state[i+ vertCursor][j + horzCursor] <= 0:
+        #     valid = False
+        #     horzCursor = 0
+        # vertCursor += 1
 
     return valid
 
