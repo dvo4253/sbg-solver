@@ -24,8 +24,9 @@ def readGameState(path):
 def printState(state):
     for row in state:
         line = ''
+        
         for item in row:
-            line = line  + str(item) + ', '
+            line = line  + str(item).rjust(3,' ') + ', '
         print(line)
 
 # Gets string output of state
@@ -221,8 +222,8 @@ def getGoalMoves(state):
         i += 1
 
     #print("MOVES: ")
-    for move in moves:
-        print(move)
+    # for move in moves:
+    #     print(move)
 
     return moves
 
@@ -475,3 +476,19 @@ def moveDown(state, move):
         # topMost = True
     
     return nextState
+
+def getStateHash(state):
+    i = 1 
+    j = 0
+    w = state[0][0]
+    h = state[0][1]
+    #printState(state)
+    string = ""
+    while i < h:
+        while j < w:
+            string += str(i) + str(j) + str(state[i][j])
+            j += 1
+        i += 1
+        j = 0
+    # print(string)
+    return hash(string)
