@@ -1,134 +1,112 @@
-import random
 from src.Node import Node
-from src.Queue import Queue
 import time
 import sys
 # import queue
 import src.stateUtils as stateUtils
 from src.Node import Node
+import src.Search
+
 def execute(fileName):
+    
+    # # of steps taken in Random Walk
+    N = 3
 
     # Get the initial state file from input
     #inputStateFile = sys.argv[1]
     inputStateFile = fileName
     # Read in the state file to a matrix
     state = stateUtils.readGameState(inputStateFile)
+
+    # state = stateUtils.normalizeState(state)
+   
     # stateUtils.printState(state)
+    # currentNode = Node(state)
 
-    # queue = Queue()
+    # print("Random Walk (N=3)")
+    # src.Search.Random(state, N)
 
-    state = stateUtils.normalizeState(state)
-    # print("Normalized State")
-    # print("~~~~~~~~~~~~~~~~~~~~~~~~~")
-    stateUtils.printState(state)
-
-    # moves = stateUtils.getValidMoves(state)
-
-    
-    # currentNode.moves = moves
-    currentNode = Node(state)
-    # queue.enqueue(currentNode)
-
-    dictionary = {currentNode.hash: []}
+    dictionary = {}
     start = time.time()
-    visited = BFS(dictionary, state)
+    visited = src.Search.BFS(dictionary, state)
     end = time.time()
     totalSecs = end - start
     
-    
-    # stateUtils.printState(dictionary[visited[-1]][0].parent.state)
-    
-    parent = dictionary[visited[-1]][0].parent
-    finalPath = []
-    while parent: 
-        finalPath.append(parent)
-        # print(parent[1])
-        if hasattr(parent[0],'parent'):
-            parent = parent[0].parent
-        else:
-            parent = None
+    print()
+    print("Breadth-First Search")
+    src.Search.PrintSearchResults(dictionary, visited[-1], totalSecs)
 
-    # move = finalPath.pop()
-    pathLength = len(finalPath)
-    while finalPath: 
-        result = finalPath.pop()
-        stateUtils.printState(result[0].state)
-        print(result[1])
 
-    stateUtils.printState(dictionary[visited[-1]][0].state)
-
-    print(str(len(visited)) + " " + str(round(totalSecs, 2)) + " " + str(pathLength))
-    # for  move in dictionary[visited[-1]][0].moves:
-    #     print(move)
-    # # for node in dictionary[visited[1]]:
+    dictionary = {}
+    start = time.time()
+    visited = src.Search.DFS(dictionary, state, False)
+    end = time.time()
+    totalSecs = end - start
+    # print("VISITED: ")
+    # print(visited[-1])
+    # for hash in visited:
+    #     print(str(hash))
+    # print(dictionary[visited[-1]])
+    # for node in dictionary[visited[-1]]:
+    #     parentHash = print(node.parent[0].hash)
     #     stateUtils.printState(node.state)
-    #Random(state)
 
+    # print("DICTIONARY: ")
+    goalNode = dictionary[visited[-1]][0]
+    node = goalNode
+    parentHash = node.parent[0].hash
+    parentMove = node.parent[1]
+    # print("PARENT MOVE: ")
+    # print(parentMove)
+    
+    print()
+    print("Depth-First Search")
 
-
-def Random(initialState):
-    MAX_MOVES = 100000
-    move_count = 0
-    currentState = initialState
-
-    while(not stateUtils.inGoalCheck(currentState) and move_count < MAX_MOVES):
-        #input("Press Enter to continue...")
-        moves = stateUtils.getValidMoves(currentState)
-        selectedMove = random.randint(0,len(moves) - 1)
-        #print("# of Moves " + str(len(moves)))
-        print(str(moves[selectedMove]))
-
-        # for moveItem in moves:
-        #     print(moveItem)
-            
-        currentState = stateUtils.makeMove(currentState, moves[selectedMove])
-        #stateUtils.printState(currentState)
+    stateUtils.printState(state)
+    finalPath = [ parentMove ]
+    while parentHash != None:
+        node = dictionary[parentHash][0]
         
-        currentState = stateUtils.normalizeState(currentState)
-        #print("Normalized State")
-        #stateUtils.printState(currentState)
-        move_count += 1
+        # stateUtils.printState(node.state)
+        if hasattr(node,'parent'):
+            finalPath.append(node.parent[1])
+            parentHash = node.parent[0].hash
+            # stateUtils.printState(parent[0].state)
+        else:
+            parentHash = None
         
-        # print("~~~~~~~~~~~~~~~~~~~~~~~~~")
-        # print("TOTAL # MOVES: " + str(move_count))
+    for move in reversed(finalPath):
+        print(move)
     
-    stateUtils.printState(currentState)
-    
+    stateUtils.printState(goalNode.state)
 
-    
-def BFS(graph, startState):
-    queue = Queue()
-    currentNode = Node(startState)
-    queue.enqueue(currentNode)
-    visited = []
-    explored = []
-    i = 0
-    inGoal = False
-    while (queue.size() > 0 and not inGoal):
+    print(str(len(dictionary)) + " " + str(round(totalSecs, 5)) + " " + str(len(finalPath)))
+    # for hash in dictionary:
+    #     print(str(hash))
+        
+    #     if(hasattr(dictionary[hash][0], "parent")):
+    #         print(str(dictionary[hash][0].parent[0].hash))
+    #         stateUtils.printState(dictionary[hash][0].parent[0].state)
+    #     else:
+    #         print("NO PARENT: ")
 
-        node = queue.dequeue()
-        if (node.hash not in visited):
-            i += 1
-            # print("Move #: " + str(i))
-            visited.append(node.hash)
-            inGoal = stateUtils.inGoalCheck(node.state)
-            
-            #stateUtils.printState(node.state)
+    # parent = dictionary[visited[-1]][0].parent[0]
+    # finalPath = []
+    # # Navigate through parent nodes to
+    # # retrieve the path to the goal node.
+    # while parent: 
+    #     finalPath.append(parent)
+    #     # print(parent[1])
+    #     if hasattr(parent[0],'parent'):
+    #         parent = dictionary[parent[0].hash][0]
+    #         stateUtils.printState(parent[0].state)
+    #     else:
+    #         parent = None
 
-            moves = stateUtils.getValidMoves(node.state)
-            node.moves = moves
-            for move in moves:
-                childState = stateUtils.makeMove(node.state, move)
-                childState = stateUtils.normalizeState(childState)
-                childNode = Node(childState)
-                # parent is a tuple containing the move and the node
-                childNode.parent = (node, move)
-                queue.enqueue(childNode)
-                if (node.hash not in graph.keys()):
-                    graph[node.hash] = [node, childNode]
-                else:
-                    graph[node.hash].append(childNode)
-                
 
-    return visited
-    
+        
+
+
+
+
+    # src.Search.PrintSearchResults(dictionary, visited[-1], totalSecs)
+   

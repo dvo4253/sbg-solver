@@ -17,8 +17,9 @@ def readGameState(path):
                 newRow.append(item)
 
             matrix.append(newRow)
-            
-    return matrix
+        
+    return normalizeState(matrix)
+    # return matrix
 
 # Print the state of the game from matrix
 def printState(state):
@@ -26,8 +27,9 @@ def printState(state):
         line = ''
         
         for item in row:
-            line = line  + str(item).rjust(3,' ') + ', '
+            line = line  + str(item) + ', '
         print(line)
+    print()
 
 # Gets string output of state
 def strState(state):
@@ -375,7 +377,8 @@ def makeMove(currentState, move):
     else:
         nextState = cloneState(currentState)
 
-    return nextState
+    return normalizeState(nextState)
+    # return nextState
 
 
 
