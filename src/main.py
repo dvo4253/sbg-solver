@@ -23,7 +23,7 @@ def execute(fileName):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     dictionary = {}
     start = time.time()
-    visited = src.Search.DFS(dictionary, state, False, False)
+    visited = src.Search.DFS(dictionary, state, False, -1)
     end = time.time()
     totalSecs = end - start
     
@@ -33,7 +33,7 @@ def execute(fileName):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     dictionary = {}
     start = time.time()
-    visited = src.Search.DFS(dictionary, state, False, True)
+    visited = src.Search.DFS(dictionary, state, False, 1)
     end = time.time()
     totalSecs = end - start
 

@@ -1,6 +1,5 @@
 from src.Move import Move, DIRECTION
 import csv
-__all__ = ["readGameState"]
 
 def readGameState(path):
     matrix = []
@@ -19,7 +18,6 @@ def readGameState(path):
             matrix.append(newRow)
         
     return normalizeState(matrix)
-    # return matrix
 
 # Print the state of the game from matrix
 def printState(state):
@@ -42,7 +40,6 @@ def strState(state):
 
     return strResult
 
-    
 
 def cloneState(state):
     newState = []
@@ -64,48 +61,35 @@ def normalizeState(state):
     nextIdx = 3
     w = state[0][0]
     h = state[0][1]
-    #print("h: " + str(h))
     i = 2
     j = 1
+
     while i < h:
-        #print("w: " + str(w))
         j = 1
         while j < w:
-            #print("nextIdx: " + str(nextIdx))
-            #print("state[i][j]: " + str(state[i][j]))
+
             if state[i][j] == nextIdx:
-                #print("NOT SWAPPING")
                 nextIdx += 1
             elif state[i][j] > nextIdx:
-                #print("SWAPPING")
                 state = swapIdx(nextIdx, state[i][j], state)
-                #print("Swapped State:")
-                #printState(state)
                 nextIdx += 1
             j += 1
         i += 1
     return state
 
 def swapIdx(idx1, idx2, state):
-    #print("idx1: " + str(idx1))
-    #print("idx2: " + str(idx2))
-    #printState(state)
     w = state[0][0]
     h = state[0][1]
-    #print("h: " + str(h))
     i = 2
     j = 1
+    
     while i < h:
-        #print("i: " + str(i))
         j = 1
         while j < w:
-            #print("j: " + str(j))
             
             if (state[i][j] == idx1):
-                #print("SWAP: " + str(idx2))
                 state[i][j] = idx2
             elif (state[i][j] == idx2):
-                #print("SWAP: " + str(idx1))
                 state[i][j] = idx1
             j += 1
         i += 1
@@ -177,18 +161,14 @@ def getGoalMoves(state):
     goalIdx = 2
     w = state[0][0]
     h = state[0][1]
-    #print("h: " + str(h))
+
     i = 2
     j = 1
 
     goalFound = False
     while i < h:
         while j < w:
-            # print("i: " + str(i))
-            # print("j: " + str(j))
-            
-            # print("goalIdx: " + str(goalIdx))
-            # print("state[i][j]: " + str(state[i][j]))
+
             if state[i][j] == goalIdx:
                 goalFound = True
                 # Check If Right Move Is Valid
@@ -198,7 +178,6 @@ def getGoalMoves(state):
                     moves.append(move)
                 
                 # Check If Left Move Is Valid
-                # print("Checking Goal Left")
                 leftValid = checkLeftValid(i,j,state,goalIdx)
                 if (leftValid): 
                     move = Move(goalIdx, DIRECTION.LEFT)
@@ -223,18 +202,14 @@ def getGoalMoves(state):
         j = 1
         i += 1
 
-    #print("MOVES: ")
-    # for move in moves:
-    #     print(move)
-
     return moves
 
 # These calls should be consolidated to only one nested loop
 def checkUpValid(i,j, state, id):
     w = state[0][0]
-    # h = state[0][1]
+
     horzCursor = 0
-    #vertCursor = 0
+    
     valid = True
 
     while state[i][j + horzCursor] == id and j + horzCursor < w:
@@ -269,53 +244,29 @@ def checkRightValid(i,j, state, id):
     vertCursor = 0
     valid = True
 
-    # print("i: " + str(i))
-    # print("j: " + str(j))
-    # print("id: " + str(id))
-
     while (state[i+ vertCursor][j] == id) and (i + vertCursor < h):
-        # print("state[i+ vertCursor][j]: " + str(state[i+ vertCursor][j]))
+
         while state[i+ vertCursor][j + horzCursor] == id and j < w and i < h:
             horzCursor += 1
-        # print("state[i+ vertCursor][j + horzCursor]: " + str(state[i+ vertCursor][j + horzCursor]))
         if((state[i+ vertCursor][j + horzCursor] > 0) or (id != 2 and state[i+ vertCursor][j + horzCursor] == -1)):
             valid = False
         
         horzCursor = 0
         vertCursor += 1
-        # print("VALID: " + str(valid))
-        
-    # print("VALID2: " + str(valid))
-    return valid
 
-    
+    return valid
 
 def checkLeftValid(i,j, state, id):
     w = state[0][0]
     h = state[0][1]
-    horzCursor = 0
     vertCursor = 0
     valid = True
 
-    # print("i: " + str(i))
-    # print("j: " + str(j))
-    # print("id: " + str(id))
-
     while (state[i+ vertCursor][j] == id) and (i + vertCursor < h):
-        # print("vertCursor: " + str(vertCursor))
-        # print("state[i+ vertCursor][j - 1]: " + str(state[i+ vertCursor][j - 1]))
+        
         if((state[i+ vertCursor][j - 1] > 0) or (id != 2 and state[i+ vertCursor][j - 1] == -1)):
             valid = False
         vertCursor += 1
-
-
-        # while state[i+ vertCursor][j + horzCursor] == id and j > 1 and i > 1:
-        #     horzCursor -= 1
-        
-        # if state[i+ vertCursor][j + horzCursor] <= 0:
-        #     valid = False
-        #     horzCursor = 0
-        # vertCursor += 1
 
     return valid
 
@@ -338,13 +289,10 @@ def isStateEqual(state1, state2):
     h = h1
     w = w1
 
-    #print("h: " + str(h))
-    #print("w: " + str(w))
     while (i < h and equalFlag):
 
         while (j < w and equalFlag):
-            #print("i: " + str(i))
-            #print("j: " + str(j))
+            
             if (state1[i][j] != state2[i][j]):
                 equalFlag = False
             j += 1
@@ -378,9 +326,6 @@ def makeMove(currentState, move):
         nextState = cloneState(currentState)
 
     return normalizeState(nextState)
-    # return nextState
-
-
 
 def moveLeft(state, move):
     w = state[0][0]
@@ -450,7 +395,6 @@ def moveUp(state, move):
             bottomMost = False
         i -= 1
         j = 0
-        # bottomMost = True
     
     return nextState
 
@@ -476,22 +420,5 @@ def moveDown(state, move):
             topMost = False
         i += 1
         j = 0
-        # topMost = True
     
     return nextState
-
-def getStateHash(state):
-    i = 1 
-    j = 0
-    w = state[0][0]
-    h = state[0][1]
-    #printState(state)
-    string = ""
-    while i < h:
-        while j < w:
-            string += str(i) + str(j) + str(state[i][j])
-            j += 1
-        i += 1
-        j = 0
-    # print(string)
-    return hash(string)

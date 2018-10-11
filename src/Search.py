@@ -13,7 +13,7 @@ def Random(initialState, N):
     stateUtils.printState(currentState)
 
     # Continue Randomly until either the goal is found or the maximum number
-    # of the moves are made.
+    # of moves are made.
     while(not stateUtils.inGoalCheck(currentState) and move_count < MAX_MOVES):
         # Get list of valid moves from the current state
         moves = stateUtils.getValidMoves(currentState)
@@ -29,60 +29,120 @@ def Random(initialState, N):
 
         stateUtils.printState(currentState)
         
+        # Increment the move count to
+        # ensure we keep it under the max # of moves
         move_count += 1
-    
-    
-    
 
-    
+# ******************************************************************************
+#   Description:   Creates and utilized Breadth-First Search to navigate a graph created from the 
+#                  starting state of the Sliding Block Puzzle. 
+#             
+#                  1) A node representing the initial state of the puzzle is added to the queue
+#                  2) While there are nodes in the fringe state queue and the goal has not been reached
+#                     dequeue a node from the queue
+#                  3) Check if the node is in the closed set (visited array) Continue evaluating the
+#                     state if it hasn't been visited. Otherwise get the next node from the queue
+#                  4) Check if it is a goal state
+#                  5) Generate moves from the state
+#                  6) For each move generate the resulting states, create a Node object 
+#                     and add it to the queue.
+#                  7) Add the node to the dictionary to create the graph relationship between
+#                     the current state and the resulting states.
+#                  8) Repeat steps 2 - 7 
+#
+#   Paremeters:    graph --      Dictionary to keep track of the graph representing the states
+#                                and connected states. 
+#                                   Key: A hash of the state matrix.
+#                                   Value: An array of Nodes representing the connected states
+#
+#                  startState -- Matrix (same format as the initial file) representing the
+#                                starting state of the sliding block puzzle           
+#
+# ******************************************************************************
 def BFS(graph, startState):
-    queue = Queue()
 
+    # FIFO Queue used to keep track of the fringe state to explore
+    queue = Queue()
+    # 1) A node representing the initial state of the puzzle is added to the queue
     currentNode = Node(startState)
-    
     graph[currentNode.hash] = [currentNode]
+
     queue.enqueue(currentNode)
     visited = []
 
     i = 0
     inGoal = False
+    # 2) While there are nodes in the fringe state queue and the goal has not been reached
+    #    dequeue a node from the queue
     while (queue.size() > 0 and not inGoal):
 
         node = queue.dequeue()
+        # 3) Check if the node is in the closed set (visited array) Continue evaluating the
+#            state if it hasn't been visited. Otherwise get the next node from the queue
         if (node.hash not in visited):
             i += 1
-
+            # The node is now visited
             visited.append(node.hash)
+            # 4) Check if it is a goal state
             inGoal = stateUtils.inGoalCheck(node.state)
-
+            # 5) Generate moves from the state
             moves = stateUtils.getValidMoves(node.state)
+            # Relate the current node to the list of valid moves from the state
+            # represented by the node
             node.moves = moves
+            # 6) For each move generate the resulting states, create a Node object 
+            #    and add it to the queue.
             for move in moves:
                 childState = stateUtils.makeMove(node.state, move)
                 childNode = Node(childState)
-                # parent is a tuple containing the move and the node
+                # parent is a tuple containing the node and the move
+                # required to get to the child from the node.
                 childNode.parent = (node, move)
                 queue.enqueue(childNode)
+                # 7) Add the node to the dictionary to create the graph relationship between
+                #    the current state and the resulting states.
                 if (node.hash not in graph.keys()):
                     graph[node.hash] = [node, childNode]
                 else:
                     graph[node.hash].append(childNode)
 
+    # The end result is an array of visited nodes
+    # The last node in the array is the node representing the goal state.
+    # The graph object is updated and can be referened by the calling function.
     return visited
     
 
-def DFS(graph, startState, inGoal, iterative):
-
-    if(iterative):
-        MAX_DEPTH = 1
-    else:
-        MAX_DEPTH = -1
+# ******************************************************************************
+#   Description:   Creates and utilized Depth-First Search to navigate a graph 
+#                  created from the starting state of the Sliding Block Puzzle. 
+#                  This function will be used as the stating point for both the 
+#                  Depth-First Search and the Interative Depth-First Search.
+#                   
+#
+#   Paremeters:    
+#                  graph --      Dictionary to keep track of the graph representing the states
+#                                and connected states. 
+#                                   Key: A hash of the state matrix.
+#                                   Value: An array of Nodes representing the connected states
+#
+#                  startState -- Matrix (same format as the initial file) representing the
+#                                starting state of the sliding block puzzle           
+#
+#                  inGoal:      Indicates of the goal state has been found.
+#
+#                  MAX_DEPTH:   Indicates the initial max depth for an iterative depth-first
+#                               search. If the value is less than zero a pure depth-first
+#                               search will be done.
+#                       
+#                       Valid Values:
+#                               True  -- Use an iterative approach startting at
+#                                        height 1 and increasing by 1
+#                               False -- Search using a pure depth-first approach.
+# ******************************************************************************
+def DFS(graph, startState, inGoal, MAX_DEPTH):
 
     current_depth = 0
-    currentNode = Node(startState)
-    
-    graph[currentNode.hash] = [currentNode]
- 
+
     while (not inGoal):
         visited = []
         inGoal = DFSHelper(graph, startState, inGoal, visited, MAX_DEPTH, current_depth)
@@ -91,6 +151,32 @@ def DFS(graph, startState, inGoal, iterative):
     return visited
 
 
+# ******************************************************************************
+#   Description:   Helper function doing most of the leg-work of the depth-first
+#                  search. Recursively called to search 
+#                   
+#
+#   Paremeters:    
+#                  graph --      Dictionary to keep track of the graph representing the states
+#                                and connected states. 
+#                                   Key: A hash of the state matrix.
+#                                   Value: An array of Nodes representing the connected states
+#
+#                  startState -- Matrix (same format as the initial file) representing the
+#                                starting state of the sliding block puzzle           
+#
+#                  inGoal:      Indicates of the goal state has been found.
+#
+#                  visited:     An array of hashes representing the states (nodes) previously
+#                               visited. Represents the closed set.
+#                  
+#                  MAX_DEPTH:   Indicates the current maxiume depth for an iterative depth-first
+#                               search. If the value is less that zero then a pure depth-first
+#                               approach will be used.
+#                  
+#                  current_depth: Current depth. Compared with the MAX_DEPTH to determine
+#                               if the max depth has been reached during an iterative approach.
+# ******************************************************************************
 def DFSHelper(graph, state, inGoal, visited, MAX_DEPTH, current_depth):
 
     currentNode = Node(state)
@@ -103,7 +189,6 @@ def DFSHelper(graph, state, inGoal, visited, MAX_DEPTH, current_depth):
         childNode = Node(childState)
 
         inGoal = stateUtils.inGoalCheck(childState)
-
 
         childNode.parent = (currentNode, move)
         if (currentNode.hash not in graph.keys()):
@@ -122,55 +207,22 @@ def DFSHelper(graph, state, inGoal, visited, MAX_DEPTH, current_depth):
 
     return inGoal
 
-# def PrintSearchResults(graph, goalStateHash, totalSecs):
-#     # Item 0 is the node itself
-#     parent = graph[goalStateHash][0].parent
-#     finalPath = []
-#     # Navigate through parent nodes to
-#     # retrieve the path to the goal node.
-#     while parent: 
-#         finalPath.append(parent)
-#         # print(parent[1])
-#         if hasattr(parent[0],'parent'):
-#             parent = parent[0].parent
-#         else:
-#             parent = None
-
-#     # move = finalPath.pop()
-#     pathLength = len(finalPath)
-#     while finalPath: 
-#         result = finalPath.pop()
-#         # stateUtils.printState(result[0].state)
-#         print(result[1])
-
-#     stateUtils.printState(graph[goalStateHash][0].state)
-
-#     print(str(len(graph)) + " " + str(round(totalSecs, 5)) + " " + str(pathLength))
-
-
-
-
 def PrintSearchResults(label, dictionary, visited, totalSecs):
     goalNode = dictionary[visited[-1]][0]
     node = goalNode
     parentHash = node.parent[0].hash
     parentMove = node.parent[1]
-    # print("PARENT MOVE: ")
-    # print(parentMove)
-    
+
     print()
     print(label)
 
-    # stateUtils.printState(state)
     finalPath = [ parentMove ]
     while parentHash != None:
         node = dictionary[parentHash][0]
         
-        # stateUtils.printState(node.state)
         if hasattr(node,'parent'):
             finalPath.append(node.parent[1])
             parentHash = node.parent[0].hash
-            # stateUtils.printState(parent[0].state)
         else:
             parentHash = None
         
