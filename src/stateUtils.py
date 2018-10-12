@@ -422,3 +422,95 @@ def moveDown(state, move):
         j = 0
     
     return nextState
+
+
+def findGoalLocation(state, goalSpaces):
+    w = state[0][0]
+    h = state[0][1]
+
+    goalLocation = None
+    
+    if (goalSpaces[0][0] == 1):
+        goalLocation = 'TOP'
+    elif (goalSpaces[0][0] == h):
+        goalLocation = 'BOTTOM'
+    elif (goalSpaces[0][1] == 0):
+        goalLocation = 'LEFT'
+    elif (goalSpaces[0][1] == w -1):
+        goalLocation = 'RIGHT'
+
+    return goalLocation
+
+def checkMasterPath(state, goalSpaces):
+    
+    goalLocation = findGoalLocation(state, goalSpaces)
+    goalDistance = None
+    masterSpaces = findMasterLocation(state)
+    LAST_MASTER_SPACE = len(masterSpaces) - 1
+    LAST_GOAL_SPACE = len(goalSpaces) - 1
+    print("MASTER")
+    print(masterSpaces)
+    if (goalLocation == 'LEFT'):
+        goalDistance  = abs(masterSpaces[0][0] - goalSpaces[0][0]) + abs(masterSpaces[0][1] - goalSpaces[0][1])
+    elif (goalLocation == 'RIGHT'):
+        goalDistance  = abs(masterSpaces[LAST_MASTER_SPACE][0] - goalSpaces[LAST_GOAL_SPACE][0]) + abs(masterSpaces[LAST_MASTER_SPACE][1] - goalSpaces[LAST_GOAL_SPACE][1])
+    elif (goalLocation == 'TOP'):
+        goalDistance  = abs(masterSpaces[0][0] - goalSpaces[0][0]) + abs(masterSpaces[0][1] - goalSpaces[0][1])
+    elif (goalLocation == 'BOTTOM'):
+        goalDistance  = abs(masterSpaces[LAST_MASTER_SPACE][0] - goalSpaces[LAST_GOAL_SPACE][0]) + abs(masterSpaces[LAST_MASTER_SPACE][1] - goalSpaces[LAST_GOAL_SPACE][1])
+
+    return goalDistance
+
+def findMasterLocation(state):
+    w = state[0][0]
+    h = state[0][1]
+    i = 1
+    j = 0
+
+    masterSpaces = []
+    while (i < h):
+        while j < w:
+            if(state[i][j] == 2):
+                masterSpaces.append((i,j))
+            j +=1
+        j = 0
+        i += 1
+
+    return masterSpaces
+
+def findGoal(state):
+    w = state[0][0]
+    h = state[0][1]
+    i = 1
+    j = 0
+    goalSpaces = []
+    
+    while (j < w):
+        # Check Top Row
+        if(state[1][j] == -1):
+            # append tuple (row column) representing
+            # the location of the goal space
+            goalSpaces.append((j,i))
+            
+        # Check Bottom Row
+        if(state[h][j] == -1):
+            goalSpaces.append((h,j))
+
+        j += 1
+    
+    while (i < h):
+        if(state[i][0] == -1):
+            goalSpaces.append((i,0))
+        
+        if(state[i][w-1] == -1):
+            goalSpaces.append((i,w-1))
+
+        i += 1
+
+    
+    return goalSpaces
+
+
+
+
+

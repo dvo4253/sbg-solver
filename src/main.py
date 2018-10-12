@@ -12,6 +12,17 @@ def execute(fileName):
     # Read in the state file to a matrix
     state = stateUtils.readGameState(inputStateFile)
 
+    stateUtils.printState(state)
+    goalSpaces = stateUtils.findGoal(state)
+    print(goalSpaces)
+
+    goalLocation = stateUtils.findGoalLocation(state, goalSpaces)
+    print(goalLocation)
+
+    distance = stateUtils.checkMasterPath(state, goalSpaces)
+
+    print(distance)
+
     dictionary = {}
     start = time.time()
     visited = src.Search.BFS(dictionary, state)
