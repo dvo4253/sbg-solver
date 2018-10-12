@@ -3,6 +3,7 @@ import time
 import src.stateUtils as stateUtils
 from src.Node import Node
 from src.Queue import Queue
+import heapq
 
 def Random(initialState, N):
     MAX_MOVES = N
@@ -206,6 +207,119 @@ def DFSHelper(graph, state, inGoal, visited, MAX_DEPTH, current_depth):
             visited.append(childNode.hash)
 
     return inGoal
+
+
+# ******************************************************************************
+#   Description:   Creates and utilized Breadth-First Search to navigate a graph created from the 
+#                  starting state of the Sliding Block Puzzle. 
+#             
+#                  1) A node representing the initial state of the puzzle is added to the queue
+#                  2) While there are nodes in the fringe state queue and the goal has not been reached
+#                     dequeue a node from the queue
+#                  3) Check if the node is in the closed set (visited array) Continue evaluating the
+#                     state if it hasn't been visited. Otherwise get the next node from the queue
+#                  4) Check if it is a goal state
+#                  5) Generate moves from the state
+#                  6) For each move generate the resulting states, create a Node object 
+#                     and add it to the queue.
+#                  7) Add the node to the dictionary to create the graph relationship between
+#                     the current state and the resulting states.
+#                  8) Repeat steps 2 - 7 
+#
+#   Paremeters:    graph --      Dictionary to keep track of the graph representing the states
+#                                and connected states. 
+#                                   Key: A hash of the state matrix.
+#                                   Value: An array of Nodes representing the connected states
+#
+#                  startState -- Matrix (same format as the initial file) representing the
+#                                starting state of the sliding block puzzle           
+#
+# ******************************************************************************
+def AStar(graph, startState):
+
+    # FIFO Queue used to keep track of the fringe state to explore
+    # queue = Queue()
+    queue = []
+    goalSpaces = stateUtils.findGoal(startState)
+    # print(goalSpaces)
+
+    # 1) A node representing the initial state of the puzzle is added to the queue
+    currentNode = Node(startState)
+    currentNode.goalDistance = stateUtils.checkMasterPath(startState, goalSpaces)
+    graph[currentNode.hash] = [currentNode]
+
+    # queue.PQInsert(currentNode)
+    queue.append(currentNode)
+    heapq.heapify(queue)
+
+    visited = []
+
+    i = 0
+    inGoal = False
+
+    # goalLocation = stateUtils.findGoalLocation(startState, goalSpaces)
+
+    # 2) While there are nodes in the fringe state queue and the goal has not been reached
+    #    dequeue a node from the queue
+    while (len(queue) > 0 and not inGoal):
+
+        i = 0
+        # print("ITEMS IN ORDER ???????")
+        # for item in queue:
+        #     print(str(i) + ": " + str(item.goalDistance))
+        #     i += 1
+        # print()
+        # childNodes = []
+        # node = queue.removeMin()
+        node = heapq.heappop(queue)
+        # 3) Check if the node is in the closed set (visited array) Continue evaluating the
+#            state if it hasn't been visited. Otherwise get the next node from the queue
+        if (node.hash not in visited):
+            i += 1
+            # The node is now visited
+            visited.append(node.hash)
+            # 4) Check if it is a goal state
+            inGoal = stateUtils.inGoalCheck(node.state)
+            # 5) Generate moves from the state
+            moves = stateUtils.getValidMoves(node.state)
+            # Relate the current node to the list of valid moves from the state
+            # represented by the node
+            node.moves = moves
+            # 6) For each move generate the resulting states, create a Node object 
+            #    and add it to the queue.
+            for move in moves:
+                childState = stateUtils.makeMove(node.state, move)
+                childNode = Node(childState)
+                # parent is a tuple containing the node and the move
+                # required to get to the child from the node.
+                childNode.parent = (node, move)
+
+                childNode.goalDistance = stateUtils.checkMasterPath(childState, goalSpaces)
+                # childNodes.append(childNode)
+                # 7) Add the node to the dictionary to create the graph relationship between
+                #    the current state and the resulting states.
+                if (node.hash not in graph.keys()):
+                    graph[node.hash] = [node, childNode]
+                else:
+                    graph[node.hash].append(childNode)
+
+                heapq.heappush(queue,childNode)
+            
+            
+            
+
+    # The end result is an array of visited nodes
+    # The last node in the array is the node representing the goal state.
+    # The graph object is updated and can be referened by the calling function.
+    return visited
+    
+
+
+
+
+
+
+
 
 def PrintSearchResults(label, dictionary, visited, totalSecs):
     goalNode = dictionary[visited[-1]][0]

@@ -5,6 +5,7 @@ class Node:
         self.hash = self.getStateHash(state)
         self.state = state
         self.moves = []
+        self.distance = 0
        
     def __str__(self):
         strResult = "****************** NODE *******************\n"
@@ -15,12 +16,12 @@ class Node:
             strResult = str(move) + "\n"
         return strResult
 
-    def addNode(self, node):
-        self.nodes.append(node)
-
     def setMoves(self, moves):
         self.moves = moves
     
+
+
+
     def getStateHash(self, state):
         i = 1 
         j = 0
@@ -37,4 +38,41 @@ class Node:
         # print(string)
         return hash(string)
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            # print("SELF: " + str(self))
+            return (self.hash == other.hash)
+        else:
+            return False
+
+    def __ne__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__dict__ != other.__dict__
+        else:
+            return False
+
+    def __lt__(self, other):
+        if isinstance(other, self.__class__):
+            return self.distance < other.distance
             
+        else:
+            return False
+    def __le__(self, other):
+        if isinstance(other, self.__class__):
+            return self.distance <= other.distance
+            
+        else:
+            return False
+
+    def __gt__(self, other):
+        if isinstance(other, self.__class__):
+            return self.distance > other.distance
+        else:
+            return False
+
+    def __ge__(self, other):
+        if isinstance(other, self.__class__):
+            return self.distance >= other.distance
+        else:
+            return False
+    

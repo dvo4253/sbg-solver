@@ -22,6 +22,8 @@ def execute(fileName):
     distance = stateUtils.checkMasterPath(state, goalSpaces)
 
     print(distance)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     dictionary = {}
     start = time.time()
@@ -49,3 +51,13 @@ def execute(fileName):
     totalSecs = end - start
 
     src.Search.PrintSearchResults("Iterative Depth-First Search", dictionary, visited, totalSecs)
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    dictionary = {}
+    start = time.time()
+    visited = src.Search.AStar(dictionary, state)
+    end = time.time()
+    totalSecs = end - start
+    
+    src.Search.PrintSearchResults("A* Search", dictionary, visited, totalSecs)

@@ -448,8 +448,7 @@ def checkMasterPath(state, goalSpaces):
     masterSpaces = findMasterLocation(state)
     LAST_MASTER_SPACE = len(masterSpaces) - 1
     LAST_GOAL_SPACE = len(goalSpaces) - 1
-    print("MASTER")
-    print(masterSpaces)
+
     if (goalLocation == 'LEFT'):
         goalDistance  = abs(masterSpaces[0][0] - goalSpaces[0][0]) + abs(masterSpaces[0][1] - goalSpaces[0][1])
     elif (goalLocation == 'RIGHT'):
