@@ -5,7 +5,6 @@ class DIRECTION(Enum):
     LEFT = 'l'
     RIGHT =  'r'
 
-
 class Move:
     def __init__(self, id, direction):
         self.id = id

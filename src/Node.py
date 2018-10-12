@@ -18,9 +18,6 @@ class Node:
 
     def setMoves(self, moves):
         self.moves = moves
-    
-
-
 
     def getStateHash(self, state):
         i = 1 

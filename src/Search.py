@@ -241,36 +241,25 @@ def AStar(graph, startState):
     # queue = Queue()
     queue = []
     goalSpaces = stateUtils.findGoal(startState)
-    # print(goalSpaces)
 
     # 1) A node representing the initial state of the puzzle is added to the queue
     currentNode = Node(startState)
     currentNode.goalDistance = stateUtils.checkMasterPath(startState, goalSpaces)
     graph[currentNode.hash] = [currentNode]
 
-    # queue.PQInsert(currentNode)
-    queue.append(currentNode)
-    heapq.heapify(queue)
+    heapq.heappush(queue,currentNode)
 
     visited = []
 
     i = 0
     inGoal = False
 
-    # goalLocation = stateUtils.findGoalLocation(startState, goalSpaces)
-
     # 2) While there are nodes in the fringe state queue and the goal has not been reached
     #    dequeue a node from the queue
     while (len(queue) > 0 and not inGoal):
 
         i = 0
-        # print("ITEMS IN ORDER ???????")
-        # for item in queue:
-        #     print(str(i) + ": " + str(item.goalDistance))
-        #     i += 1
-        # print()
-        # childNodes = []
-        # node = queue.removeMin()
+       
         node = heapq.heappop(queue)
         # 3) Check if the node is in the closed set (visited array) Continue evaluating the
 #            state if it hasn't been visited. Otherwise get the next node from the queue
@@ -294,7 +283,7 @@ def AStar(graph, startState):
                 # required to get to the child from the node.
                 childNode.parent = (node, move)
 
-                childNode.goalDistance = stateUtils.checkMasterPath(childState, goalSpaces)
+                childNode.distance = stateUtils.checkMasterPath(childState, goalSpaces)
                 # childNodes.append(childNode)
                 # 7) Add the node to the dictionary to create the graph relationship between
                 #    the current state and the resulting states.
@@ -313,13 +302,6 @@ def AStar(graph, startState):
     # The graph object is updated and can be referened by the calling function.
     return visited
     
-
-
-
-
-
-
-
 
 def PrintSearchResults(label, dictionary, visited, totalSecs):
     goalNode = dictionary[visited[-1]][0]
