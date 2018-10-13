@@ -11,6 +11,10 @@ def execute(fileName):
     inputStateFile = fileName
     # Read in the state file to a matrix
     state = stateUtils.readGameState(inputStateFile)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    print("Random Search")
+    src.Search.Random(state, N)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     dictionary = {}
@@ -24,7 +28,7 @@ def execute(fileName):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     dictionary = {}
     start = time.time()
-    visited = src.Search.DFS(dictionary, state, False, -1)
+    visited = src.Search.DFS(dictionary, state, -1)
     end = time.time()
     totalSecs = end - start
     
@@ -34,7 +38,7 @@ def execute(fileName):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     dictionary = {}
     start = time.time()
-    visited = src.Search.DFS(dictionary, state, False, 1)
+    visited = src.Search.DFS(dictionary, state, 1)
     end = time.time()
     totalSecs = end - start
 

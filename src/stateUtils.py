@@ -16,7 +16,7 @@ def readGameState(path):
                 newRow.append(item)
 
             matrix.append(newRow)
-        
+
     return normalizeState(matrix)
 
 # Print the state of the game from matrix
