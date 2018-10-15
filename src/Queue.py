@@ -1,3 +1,4 @@
+# Basic queue class created to simplify things
 class Queue:
     def __init__(self):
         self.items = []

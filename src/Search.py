@@ -5,6 +5,11 @@ from src.Node import Node
 from src.Queue import Queue
 import heapq
 
+# ******************************************************************************
+#   Description: Randomly selects a move from the list of valid moves and then
+#                executes it and set the new state as the current state.
+#                Repeat until the MAX_MOVES count has been reatched.
+# ******************************************************************************
 def Random(initialState, N):
     MAX_MOVES = N
     move_count = 0

@@ -16,6 +16,10 @@ class Move:
     def __repr__(self):
         return repr((self.id, self.dir.name))
 
+    # ***************************************************************
+    # Simple comparision functions compared first by ID and then by
+    # direction using alphabetical ordering.
+    # ***************************************************************
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             # print("SELF: " + str(self))

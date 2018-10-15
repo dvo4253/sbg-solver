@@ -19,12 +19,13 @@ class Node:
     def setMoves(self, moves):
         self.moves = moves
 
+    # Simple hash created by concatenating the rows of the matix as a string and 
+    # taking the has of the full string.
     def getStateHash(self, state):
         i = 1 
         j = 0
         w = state[0][0]
         h = state[0][1]
-        #printState(state)
         string = ""
         while i < h:
             while j < w:
@@ -32,12 +33,14 @@ class Node:
                 j += 1
             i += 1
             j = 0
-        # print(string)
+        
         return hash(string)
 
+    # ***************************************************************
+    # Compare hashes for equality
+    # ***************************************************************
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            # print("SELF: " + str(self))
             return (self.hash == other.hash)
         else:
             return False
@@ -48,6 +51,13 @@ class Node:
         else:
             return False
 
+    # ***************************************************************
+    # These comparisons are used for sorting the priority queue if one
+    # is used. Therefore these comparison functions define the heuristic
+    # Currently the distance of the Master Node to the goal node
+    # is the heuristic being used and should be assigned to the 
+    # distance attribute of the node.
+    # ***************************************************************
     def __lt__(self, other):
         if isinstance(other, self.__class__):
             return self.distance < other.distance

@@ -7,6 +7,7 @@ def readGameState(path):
     with open(path) as gameStateCSV:
         readCSV = csv.reader(gameStateCSV, delimiter=',')
         
+        # Create a 2 dimensional array to store the state read in from the file.
         for row in readCSV:
             # Last element of each row is empty
             row.pop()
@@ -17,6 +18,7 @@ def readGameState(path):
 
             matrix.append(newRow)
 
+    # The initial state will always be normalized.
     return normalizeState(matrix)
 
 # Print the state of the game from matrix
@@ -40,7 +42,10 @@ def strState(state):
 
     return strResult
 
-
+# ******************************************************************************
+# Create a new two-dimentional array to store a deep clone of the state passed
+# in to the function.
+# ******************************************************************************
 def cloneState(state):
     newState = []
     for row in state:
@@ -50,6 +55,10 @@ def cloneState(state):
         newState.append(newStateRow)
     return newState
 
+# ******************************************************************************
+# Simple check space by space check to see if the goal is met.
+# If there are any rows/columns that contain a "-1" then the goal has not been met.
+# ******************************************************************************
 def inGoalCheck(state):
     for row in state:
         for item in row:
@@ -57,19 +66,33 @@ def inGoalCheck(state):
                 return False
     return True
 
+# ******************************************************************************
+# Ensure that the state is normalized.
+# A master block will always remain a '2'. Any block '3' or greater will be 
+# re-labeled to be in a sorted order from top left to bottom right.
+# ******************************************************************************
 def normalizeState(state):
+    # Start with 3 as the first label.
     nextIdx = 3
+
     w = state[0][0]
     h = state[0][1]
     i = 2
     j = 1
 
+    # Loop through the rows
     while i < h:
         j = 1
+        # Loop through the columns
         while j < w:
-
+            # If the space already is labeld with the index of
+            # nextIdx, then just increment the nextIdx as this
+            # block already has the correcd label.
             if state[i][j] == nextIdx:
                 nextIdx += 1
+            # If the label on the space at state[i][j] is greater
+            # than the nextIdx then we must swap it out and label
+            # it with the value at nextIdx.
             elif state[i][j] > nextIdx:
                 state = swapIdx(nextIdx, state[i][j], state)
                 nextIdx += 1
@@ -77,6 +100,10 @@ def normalizeState(state):
         i += 1
     return state
 
+# ******************************************************************************
+#   Swaps all places with the label 'idx1' with the label 'idx2' in the state 
+#   passed as the 3rd parameter
+# ******************************************************************************
 def swapIdx(idx1, idx2, state):
     w = state[0][0]
     h = state[0][1]
@@ -86,33 +113,31 @@ def swapIdx(idx1, idx2, state):
     while i < h:
         j = 1
         while j < w:
-            
+            # Swap in place if the value at state[i][j] is the value of 'idx1'
             if (state[i][j] == idx1):
                 state[i][j] = idx2
+            # Swap in place if the value at state[i][j] is the value of 'idx2'    
             elif (state[i][j] == idx2):
                 state[i][j] = idx1
             j += 1
         i += 1
     return state
 
-# Currently this loops through all ids to see which ones
-# to add to the "moves" list. A better way might be to find
-# the zeros and work from there
-
-# In order for this method to work properly the 
+# ******************************************************************************
+#   Description: Returns a list of "Move" objects specifying the valid moves
+#                from the state passed in to the function
+# 
+# 
+# NOTE: In order for this method to work properly the 
 # state must be normalized
+# ******************************************************************************
 def getValidMoves(state):
     moves = []
-    # I started with this value at 3. We need to have a separate function that checks of the goal
-    # piece can move. Heuristically this is a special case that we want to track separately most likely.
-    # This is a separte call as well because we keep the rest of the pieces normalized. The goal piece
-    # always has an id of 2. Essentially we can have a separate function the gets goal moves and appends
-    # this on to the moves list at the end. Or we can have a separate list for goal moves and if that
-    # list is populated we choose one from that list first (hopefully towards to goal)
+
     nextIdx = 3
     w = state[0][0]
     h = state[0][1]
-    #print("h: " + str(h))
+
     i = 2
     j = 1
     while i < h:
@@ -120,22 +145,27 @@ def getValidMoves(state):
         while  j < w and state[i][j] != nextIdx:        
             j += 1
         while j < w:
+            # If we have reached our next idex check if a RIGHT, LEFT, DOWN, or UP move
+            # is valid in the current state.
             if state[i][j] == nextIdx:
                 
                 # Check If Right Move Is Valid
                 rightValid = checkRightValid(i,j,state,nextIdx)
+                # Add the move to the list if it is valid
                 if (rightValid): 
                     move = Move(nextIdx, DIRECTION.RIGHT)
                     moves.append(move)
                 
                 # Check If Left Move Is Valid
                 leftValid = checkLeftValid(i,j,state,nextIdx)
+                # Add the move to the list if it is valid
                 if (leftValid): 
                     move = Move(nextIdx, DIRECTION.LEFT)
                     moves.append(move)
                 
                 # Check If Down Move Is Valid
                 downValid = checkDownValid(i,j,state,nextIdx)
+                # Add the move to the list if it is valid
                 if (downValid): 
                     move = Move(nextIdx, DIRECTION.DOWN)
                     moves.append(move)
@@ -147,15 +177,26 @@ def getValidMoves(state):
                     moves.append(move)
 
             nextIdx += 1
+            # Move along to the next state.
             while  j < w and state[i][j] != nextIdx:        
                 j += 1
         i += 1
 
+    # There is a better way to do this but didn't have time to refactore
+    # rigth now. Retrieves all valid moves for the Master block 
     moves += getGoalMoves(state)
 
     return moves
 
-
+# ******************************************************************************
+#   Description: Very similar to the getValidMoves function. This just reviews 
+#                the goal node to see what the valid moves are for the Master Node
+# 
+# 
+# NOTE: In order for this method to work properly the 
+# state must be normalized. Also this is a lot of duplicate code. It should be
+# refactored into the getValidMoves function
+# ******************************************************************************
 def getGoalMoves(state):
     moves = []
     goalIdx = 2
@@ -174,24 +215,28 @@ def getGoalMoves(state):
                 # Check If Right Move Is Valid
                 rightValid = checkRightValid(i,j,state,goalIdx)
                 if (rightValid): 
+                    # Add the move to the list if it is valid
                     move = Move(goalIdx, DIRECTION.RIGHT)
                     moves.append(move)
                 
                 # Check If Left Move Is Valid
                 leftValid = checkLeftValid(i,j,state,goalIdx)
                 if (leftValid): 
+                    # Add the move to the list if it is valid
                     move = Move(goalIdx, DIRECTION.LEFT)
                     moves.append(move)
                 
                 # Check If Down Move Is Valid
                 downValid = checkDownValid(i,j,state,goalIdx)
                 if (downValid): 
+                    # Add the move to the list if it is valid
                     move = Move(goalIdx, DIRECTION.DOWN)
                     moves.append(move)
                 
                 # Check If Up Move Is Valid
                 upValid = checkUpValid(i,j,state,goalIdx)
                 if (upValid): 
+                    # Add the move to the list if it is valid
                     move = Move(goalIdx, DIRECTION.UP)
                     moves.append(move)
             j +=1
