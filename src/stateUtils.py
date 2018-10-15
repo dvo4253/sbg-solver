@@ -249,20 +249,31 @@ def getGoalMoves(state):
 
     return moves
 
-# These calls should be consolidated to only one nested loop
+# ******************************************************************************
+#   Description -- The following four functions check a different direction to see if a move
+#                  is valid. They take the following parameters
+#   i --           row of the id to check
+#   j --           colum of the id to check
+#   state --       current state to check if the move is valid
+#   id --          id of the piece to check for a valid move
+#
+#   checkUpValid, checkDownValid, checkRightValid, checkLeftValid
+# ******************************************************************************
 def checkUpValid(i,j, state, id):
     w = state[0][0]
 
     horzCursor = 0
     
     valid = True
-
+    # Verify that all spaces above the piece specified by 'id'
+    # are a 0 or -1 (if it's the master block)
     while state[i][j + horzCursor] == id and j + horzCursor < w:
         if((state[i -1][j + horzCursor] > 0) or (id != 2 and state[i -1][j + horzCursor] == -1)):
             valid = False
         horzCursor += 1
 
     return valid
+
 
 def checkDownValid(i,j, state, id):
     w = state[0][0]
@@ -271,6 +282,8 @@ def checkDownValid(i,j, state, id):
     vertCursor = 0
     valid = True
 
+    # Verify that all spaces below the piece specified by 'id'
+    # are a 0 or -1 (if it's the master block)
     while state[i+ vertCursor][j + horzCursor] == id and j < w and i < h:
         while (state[i+ vertCursor][j] == id) and (i + vertCursor < h):
             vertCursor += 1
@@ -290,9 +303,11 @@ def checkRightValid(i,j, state, id):
     valid = True
 
     while (state[i+ vertCursor][j] == id) and (i + vertCursor < h):
-
         while state[i+ vertCursor][j + horzCursor] == id and j < w and i < h:
+            # Get to the right-most space of the piece
             horzCursor += 1
+        # Verify that all spaces to the right of the piece specified by 'id'
+        # are a 0 or -1 (if it's the master block)
         if((state[i+ vertCursor][j + horzCursor] > 0) or (id != 2 and state[i+ vertCursor][j + horzCursor] == -1)):
             valid = False
         
@@ -302,19 +317,32 @@ def checkRightValid(i,j, state, id):
     return valid
 
 def checkLeftValid(i,j, state, id):
-    w = state[0][0]
     h = state[0][1]
     vertCursor = 0
     valid = True
 
     while (state[i+ vertCursor][j] == id) and (i + vertCursor < h):
-        
+        # Verify that all spaces to the left of the piece specified by 'id'
+        # are a 0 or -1 (if it's the master block)
         if((state[i+ vertCursor][j - 1] > 0) or (id != 2 and state[i+ vertCursor][j - 1] == -1)):
             valid = False
         vertCursor += 1
 
     return valid
 
+# ******************************************************************************
+#   Description --      Verifies that two states are equal by a 
+#                       space-by-space comparison. I should also just be able
+#                       to check the hashes on the Node class if it's available.
+#                       I can add that in the future.
+#                       
+#   Parameters --
+#       state1 --       First state to compare against
+#       state2 --       Second state to compare against
+#   
+#   Return Value --     True: if the states are equal
+#                       False: if the states are different
+# ******************************************************************************
 def isStateEqual(state1, state2):
     
     w1 = state1[0][0]
@@ -333,11 +361,10 @@ def isStateEqual(state1, state2):
 
     h = h1
     w = w1
-
+    # Space-by-space check to make the the states
+    # are the same
     while (i < h and equalFlag):
-
         while (j < w and equalFlag):
-            
             if (state1[i][j] != state2[i][j]):
                 equalFlag = False
             j += 1
@@ -346,17 +373,18 @@ def isStateEqual(state1, state2):
 
     return equalFlag
 
-
-def isInClosedSet(closedSet, state):
-
-    isClosed = False
-    for closedState in closedSet:
-        isClosed = isStateEqual(closedState, state)
-        if (isClosed):
-            break
-
-    return isClosed
-
+# ******************************************************************************
+# Description --        Takes a state and a move as paramters and returns the 
+#                       new state(normalized) after the move has taken place. Assumes the 
+#                       move is valid.
+# 
+# Parameters --
+#   currentState --     state to execute the move against
+#   move --             move to execute on the currentState
+#
+# Return Value --       A new state with the move executed
+#   
+# ******************************************************************************
 def makeMove(currentState, move):
     nextState = []
     if(move.dir == DIRECTION.LEFT):
@@ -372,6 +400,20 @@ def makeMove(currentState, move):
 
     return normalizeState(nextState)
 
+# ******************************************************************************
+# Description:      The following four functions execute a move on a state and 
+#                   returns the new state. In each function, the logic is similar,
+#                   just the direction is different. Read the comments in the 
+#                   'moveLeft' function for details.
+#
+# Parameters --
+#   currentState --     state to execute the move against
+#   move --             move to execute on the currentState
+#
+# Return Value --       A new state with the move executed
+#   
+#   moveLeft, moveRight, moveUp, moveDown
+# ******************************************************************************
 def moveLeft(state, move):
     w = state[0][0]
     h = state[0][1]
@@ -379,17 +421,32 @@ def moveLeft(state, move):
     j = w - 1
     rightMost = True
     
+    # Initially the next state will be a cloned
+    # version of the current state.
     nextState = cloneState(state)
     
+    # Loop through the spaces. If we get to a space
+    # that matches the id in the 'move' object then
+    # shift it to the left.
     while i < h:
+        # Loop from right-to-left on each row. Makes some
+        # of the logic easier for leaving the open space (0)
+        # behind after the move.
         while j > 0:
             if (state[i][j] == move.id):
                 nextState[i][j-1] = state[i][j]
+                # If the space is the right-most space
+                # of the piece then we need to leave
+                # an open space.
                 if (rightMost):
                     nextState[i][j] = 0
                     rightMost = False
+            
+            # Decrement j to move left in the row
             j -= 1
+        # Next row
         i += 1
+        # Reset j to the right-most space
         j = w - 1
         rightMost = True
     
@@ -468,13 +525,22 @@ def moveDown(state, move):
     
     return nextState
 
-
+# ******************************************************************************
+# Description --        Returns a string indicating where the goal is in the game.
+# 
+# Parameters -- 
+#   state --            Current state. We really just need the dimensions of the state
+#                       for this check.
+#   goalSpaces --       Array of tuples representing the (row,column) of each 
+#                       goal space
+# ******************************************************************************
 def findGoalLocation(state, goalSpaces):
     w = state[0][0]
     h = state[0][1]
 
     goalLocation = None
     
+    # We only need to look at the first goal space.
     if (goalSpaces[0][0] == 1):
         goalLocation = 'TOP'
     elif (goalSpaces[0][0] == h):
@@ -486,26 +552,55 @@ def findGoalLocation(state, goalSpaces):
 
     return goalLocation
 
+# ******************************************************************************
+# Description --        Calculates a simple heuristic indicating how far the 
+#                       master block is away from the goal. This a direct path
+#                       calculation, not concidering any other blocks in the way.
+#
+# Parameters --
+#   state --            State to check how far away the master block is from the goal
+#   goalSpaces --       An array of tuples indicating the (row, column) spaces for
+#                       the goal.
+#
+# Return Value --       An integer indicating the distance the master block is 
+#                       from the goal.
+# ******************************************************************************
 def checkMasterPath(state, goalSpaces):
     
     goalLocation = findGoalLocation(state, goalSpaces)
     goalDistance = None
-    masterSpaces = findMasterLocation(state)
+    # Retrieve an array of tuples (row,column) indicating the spaces
+    # the master block occupies in the state
+    masterSpaces = findMasterSpaces(state)
     LAST_MASTER_SPACE = len(masterSpaces) - 1
     LAST_GOAL_SPACE = len(goalSpaces) - 1
 
+    # Calculate the distance
     if (goalLocation == 'LEFT'):
+        # The first master space will be the upper left space of the master block
         goalDistance  = abs(masterSpaces[0][0] - goalSpaces[0][0]) + abs(masterSpaces[0][1] - goalSpaces[0][1])
     elif (goalLocation == 'RIGHT'):
+        # The last master space will be the lower right space of the master block
+        # Compare the lower-right master block space to the lowest goal space.
+        # for the distance calculation.
         goalDistance  = abs(masterSpaces[LAST_MASTER_SPACE][0] - goalSpaces[LAST_GOAL_SPACE][0]) + abs(masterSpaces[LAST_MASTER_SPACE][1] - goalSpaces[LAST_GOAL_SPACE][1])
     elif (goalLocation == 'TOP'):
+        # The first master space will be the upper left space of the master block
+        # Compare the top-left master block space to the left-most goal space.
         goalDistance  = abs(masterSpaces[0][0] - goalSpaces[0][0]) + abs(masterSpaces[0][1] - goalSpaces[0][1])
     elif (goalLocation == 'BOTTOM'):
+        # The last master space will be the lower right space of the master block
+        # Compare the lower-right master block space to the right-most goal space.
+        # for the distance calculation.
         goalDistance  = abs(masterSpaces[LAST_MASTER_SPACE][0] - goalSpaces[LAST_GOAL_SPACE][0]) + abs(masterSpaces[LAST_MASTER_SPACE][1] - goalSpaces[LAST_GOAL_SPACE][1])
 
     return goalDistance
 
-def findMasterLocation(state):
+# ******************************************************************************
+# Description --        Return an array of tuples (row, column) that
+#                       Indicate where the master block piece lies within the state
+# ******************************************************************************
+def findMasterSpaces(state):
     w = state[0][0]
     h = state[0][1]
     i = 1
@@ -522,6 +617,10 @@ def findMasterLocation(state):
 
     return masterSpaces
 
+# ******************************************************************************
+# Description --        Return an array of tuples (row, column) that
+#                       Indicate where the goal lies within the state
+# ******************************************************************************
 def findGoal(state):
     w = state[0][0]
     h = state[0][1]
@@ -543,9 +642,10 @@ def findGoal(state):
         j += 1
     
     while (i < h):
+        # Check the left side
         if(state[i][0] == -1):
             goalSpaces.append((i,0))
-        
+        # Check the right side
         if(state[i][w-1] == -1):
             goalSpaces.append((i,w-1))
 
@@ -553,8 +653,4 @@ def findGoal(state):
 
     
     return goalSpaces
-
-
-
-
 
