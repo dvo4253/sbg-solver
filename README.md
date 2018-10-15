@@ -1,7 +1,13 @@
 # Sliding Block Puzzle Solver
+Nathan Dvorachek
+
+## Execution instructions
+Run `sh hw1.sh` to view the output against the SBP-level1.txt as a default.
+
+Run `sh run.sh <<FILENAME>>` to execute against a specific file in the state dirctory. 
 
 
-
+For example: `sh run.sh SBP-level0.txt` will execute agains the `SBP-level0.txt` file in the `./state` directory.
 ### Files
 
 #### main.py
@@ -55,7 +61,9 @@ Contains each of the main methods to exeucte a search for a solution of the slid
 
 
 #### stateUtils.py
-
+Contains a number of utilities such reading the initial state from the file, checking valid moves
+executing moves and heuristic functions for A* search. See the documentation in the file for
+further details.
 
 
 
