@@ -56,13 +56,17 @@ def Random(initialState, N):
 #                  8) Repeat steps 2 - 7 
 #
 #   Paremeters:    graph --      Dictionary to keep track of the graph representing the states
-#                                and connected states. 
+#                                and connected states. (Modifed and used upon return in the
+#                                calling function.)
 #                                   Key: A hash of the state matrix.
 #                                   Value: An array of Nodes representing the connected states
 #
 #                  startState -- Matrix (same format as the initial file) representing the
 #                                starting state of the sliding block puzzle           
 #
+#   Return Value: An array of hashes representing the closed set. When the goal
+#                 is met the last value of the closed set is the hash representing
+#                 the final goal state.
 # ******************************************************************************
 def BFS(graph, startState):
 
@@ -126,7 +130,8 @@ def BFS(graph, startState):
 #
 #   Paremeters:    
 #                  graph --      Dictionary to keep track of the graph representing the states
-#                                and connected states. 
+#                                and connected states. (Modifed and used upon return in the
+#                                calling function.)
 #                                   Key: A hash of the state matrix.
 #                                   Value: An array of Nodes representing the connected states
 #
@@ -144,6 +149,10 @@ def BFS(graph, startState):
 #                                        height MAX_DEPTH. MAX_DEPTH will increase by 
 #                                        1 until the goal is found.
 #                                < 0  -- Search using a pure depth-first approach.
+#
+#   Return Value: An array of hashes representing the closed set. When the goal
+#                 is met the last value of the closed set is the hash representing
+#                 the final goal state.
 # ******************************************************************************
 def DFS(graph, startState, MAX_DEPTH):
     inGoal = False
@@ -168,12 +177,14 @@ def DFS(graph, startState, MAX_DEPTH):
 
 # ******************************************************************************
 #   Description:   Helper function doing most of the leg-work of the depth-first
-#                  search. Recursively called to search 
+#                  search. Recursively called to search depth-first. Will navigate
+#                  laterally upon return of the recurrsive call for each valid move.
 #                   
 #
 #   Paremeters:    
 #                  graph --      Dictionary to keep track of the graph representing the states
-#                                and connected states. 
+#                                and connected states. (Modifed and used upon return in the
+#                                calling function.) 
 #                                   Key: A hash of the state matrix.
 #                                   Value: An array of Nodes representing the connected states
 #
@@ -191,6 +202,10 @@ def DFS(graph, startState, MAX_DEPTH):
 #                  
 #                  current_depth: Current depth. Compared with the MAX_DEPTH to determine
 #                               if the max depth has been reached during an iterative approach.
+#
+#   Return Value: An array of hashes representing the closed set. When the goal
+#                 is met the last value of the closed set is the hash representing
+#                 the final goal state.
 # ******************************************************************************
 def DFSHelper(graph, state, inGoal, visited, MAX_DEPTH, current_depth):
 
@@ -267,13 +282,18 @@ def DFSHelper(graph, state, inGoal, visited, MAX_DEPTH, current_depth):
 #                  8) Repeat steps 2 - 7 
 #
 #   Paremeters:    graph --      Dictionary to keep track of the graph representing the states
-#                                and connected states. 
+#                                and connected states. (Modifed and used upon return in the
+#                                calling function.)
 #                                   Key: A hash of the state matrix.
 #                                   Value: An array of Nodes representing the connected states
 #
 #                  startState -- Matrix (same format as the initial file) representing the
 #                                starting state of the sliding block puzzle           
 #
+#
+#   Return Value: An array of hashes representing the closed set. When the goal
+#                 is met the last value of the closed set is the hash representing
+#                 the final goal state.
 # ******************************************************************************
 def AStar(graph, startState):
 
